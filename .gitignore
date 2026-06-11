@@ -5,6 +5,6 @@ dist/
 *.db-journal
 .env
 .env.local
-uploads/
+backend/uploads/
 .DS_Store
 tsconfig.build.tsbuildinfo
