@@ -1,0 +1,14 @@
+{
+  "name": "publisher",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter backend dev\" \"pnpm --filter frontend dev\"",
+    "build": "pnpm --filter backend build && pnpm --filter frontend build",
+    "backend": "pnpm --filter backend dev",
+    "frontend": "pnpm --filter frontend dev"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}
