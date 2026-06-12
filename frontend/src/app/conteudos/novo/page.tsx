@@ -20,6 +20,8 @@ export default function NovoConteudo() {
   const [step, setStep] = useState<Step>('tipo');
   const [personas, setPersonas] = useState<any[]>([]);
   const [padroes, setPadroes] = useState<any[]>([]);
+  const [loadingPersonas, setLoadingPersonas] = useState(true);
+  const [personasError, setPersonasError] = useState('');
   const [personaId, setPersonaId] = useState<string | null>(null);
   const [padraoId, setPadraoId] = useState<string | null>(null);
   const [theme, setTheme] = useState('');
@@ -28,10 +30,23 @@ export default function NovoConteudo() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    getPersonas().then(setPersonas).catch(() => {});
-    getPadroes().then(setPadroes).catch(() => {});
-  }, []);
+  const loadData = () => {
+    setLoadingPersonas(true);
+    setPersonasError('');
+    Promise.all([
+      getPersonas().catch(() => null),
+      getPadroes().catch(() => null),
+    ]).then(([p, pad]) => {
+      if (!p || !Array.isArray(p) || p.length === 0) {
+        setPersonasError('Não foi possível carregar as personas. Verifique se o backend está online.');
+      } else {
+        setPersonas(p);
+      }
+      if (pad && Array.isArray(pad)) setPadroes(pad);
+    }).finally(() => setLoadingPersonas(false));
+  };
+
+  useEffect(() => { loadData(); }, []);
 
   const STEPS = contentType === 'carrossel' ? CARROSSEL_STEPS : TEXTO_STEPS;
   const stepIndex = STEPS.indexOf(step);
@@ -143,8 +158,15 @@ export default function NovoConteudo() {
           <div>
             <h2 className="text-lg font-semibold text-gray-900 mb-1">Para quem é este conteúdo?</h2>
             <p className="text-sm text-gray-500 mb-5">Escolha a marca ou o perfil do público-alvo</p>
-            {personas.length === 0 ? (
-              <p className="text-sm text-gray-400 py-4">Carregando personas...</p>
+            {loadingPersonas ? (
+              <div className="flex items-center gap-2 py-6 text-sm text-gray-400">
+                <Loader2 size={16} className="animate-spin" /> Carregando personas...
+              </div>
+            ) : personasError ? (
+              <div className="py-4">
+                <p className="text-sm text-red-500 mb-3">{personasError}</p>
+                <button onClick={loadData} className="text-sm text-blue-600 font-medium hover:underline">Tentar novamente</button>
+              </div>
             ) : (
               <div className="grid grid-cols-2 gap-3">
                 {personas.map((p) => (
