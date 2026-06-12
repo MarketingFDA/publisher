@@ -22,7 +22,7 @@ export default function Sidebar() {
           </div>
           <div>
             <p className="text-sm font-bold text-gray-900">Publisher</p>
-            <p className="text-xs text-blue-600 font-medium">Fradema · Arrighi</p>
+            <p className="text-xs text-blue-600 font-medium">Grupo FDA</p>
           </div>
         </div>
       </div>
