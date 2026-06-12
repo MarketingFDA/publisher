@@ -6,8 +6,7 @@ import {
   Plus, Trash2, Square, Circle, Minus, Copy, Image, FileDown,
 } from 'lucide-react';
 
-const _apiRoot = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/+$/, '');
-const BASE = _apiRoot.endsWith('/api/v1') ? _apiRoot : `${_apiRoot}/api/v1`;
+const BASE = '/api/v1';
 
 interface Shape {
   id: string;

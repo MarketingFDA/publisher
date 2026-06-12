@@ -2,8 +2,7 @@
 import { useEffect, useState } from 'react';
 import { TrendingUp, Users, FileText, Star, Activity, Award, AlertCircle, CheckCircle, Clock } from 'lucide-react';
 
-const _apiRoot = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/+$/, '');
-const BASE = _apiRoot.endsWith('/api/v1') ? _apiRoot : `${_apiRoot}/api/v1`;
+const BASE = '/api/v1';
 
 interface Content { id: string; title: string; status: string; createdAt: string; persona?: { name: string }; padrao?: { name: string; code: string }; }
 
