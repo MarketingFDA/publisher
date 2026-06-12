@@ -1,9 +1,14 @@
-import { Controller, Get, Param, Patch, Put, Body, Delete } from '@nestjs/common';
+import { Controller, Get, Param, Patch, Put, Post, Body, Delete } from '@nestjs/common';
 import { ContentService } from './content.service';
 
 @Controller('content')
 export class ContentController {
   constructor(private readonly contentService: ContentService) {}
+
+  @Post()
+  create(@Body() body: { title: string; body: string; personaId: string; theme?: string }) {
+    return this.contentService.create(body);
+  }
 
   @Get()
   findAll() { return this.contentService.findAll(); }

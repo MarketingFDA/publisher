@@ -18,11 +18,11 @@ export default function Sidebar() {
       <div className="p-5 border-b border-gray-100">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <span className="text-xs font-bold text-white">M</span>
+            <span className="text-xs font-bold text-white">FDA</span>
           </div>
           <div>
             <p className="text-sm font-bold text-gray-900">Publisher</p>
-            <p className="text-xs text-blue-600 font-medium">Marketing FDA</p>
+            <p className="text-xs text-blue-600 font-medium">Fradema · Arrighi</p>
           </div>
         </div>
       </div>

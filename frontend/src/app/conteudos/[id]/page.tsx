@@ -6,7 +6,8 @@ import {
   Plus, Trash2, Square, Circle, Minus, Copy, Image, FileDown,
 } from 'lucide-react';
 
-const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+const _apiRoot = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/+$/, '');
+const BASE = _apiRoot.endsWith('/api/v1') ? _apiRoot : `${_apiRoot}/api/v1`;
 
 interface Shape {
   id: string;
@@ -100,6 +101,7 @@ function SlideCanvas({
   return (
     <div
       ref={canvasRef}
+      id="slide-canvas-main"
       onClick={() => onSelectShape(null)}
       style={{ background: t.bg, width: '100%', aspectRatio: '1/1', position: 'relative', borderRadius: 12, overflow: 'hidden', border: `1px solid ${t.border}`, userSelect: 'none', fontFamily: "'Inter', system-ui, sans-serif" }}
     >
@@ -332,7 +334,57 @@ export default function ContentEditor() {
     e.target.value = '';
   };
 
-  const exportPDF = () => { window.print(); };
+  const [exporting, setExporting] = useState(false);
+
+  const exportSlide = async (format: 'png' | 'pdf') => {
+    const el = document.getElementById('slide-canvas-main');
+    if (!el || exporting) return;
+    setExporting(true);
+    try {
+      const h2c = (await import('html2canvas')).default;
+      const cvs = await h2c(el, { scale: 2, useCORS: true, logging: false });
+      const dataUrl = cvs.toDataURL('image/png');
+      if (format === 'png') {
+        const a = document.createElement('a');
+        a.download = `${title || 'slide'}-${current + 1}.png`;
+        a.href = dataUrl;
+        a.click();
+      } else {
+        const { jsPDF } = await import('jspdf');
+        const w = cvs.width / 2; const h = cvs.height / 2;
+        const pdf = new jsPDF({ orientation: 'portrait', unit: 'px', format: [w, h] });
+        pdf.addImage(dataUrl, 'PNG', 0, 0, w, h);
+        pdf.save(`${title || 'slide'}-${current + 1}.pdf`);
+      }
+    } catch (e) { console.error('Export error:', e); }
+    setExporting(false);
+  };
+
+  const exportAllPDF = async () => {
+    if (!doc || exporting) return;
+    setExporting(true);
+    const origSlide = current;
+    try {
+      const h2c = (await import('html2canvas')).default;
+      const { jsPDF } = await import('jspdf');
+      let pdf: InstanceType<typeof jsPDF> | null = null;
+      for (let i = 0; i < doc.slides.length; i++) {
+        setCurrent(i);
+        await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+        const el = document.getElementById('slide-canvas-main');
+        if (!el) continue;
+        const cvs = await h2c(el, { scale: 2, useCORS: true, logging: false });
+        const w = cvs.width / 2; const h = cvs.height / 2;
+        const dataUrl = cvs.toDataURL('image/png');
+        if (!pdf) { pdf = new jsPDF({ orientation: 'portrait', unit: 'px', format: [w, h] }); }
+        else { pdf.addPage([w, h], 'portrait'); }
+        pdf.addImage(dataUrl, 'PNG', 0, 0, w, h);
+      }
+      if (pdf) pdf.save(`${title || 'carrossel'}.pdf`);
+      setCurrent(origSlide);
+    } catch (e) { console.error('Export error:', e); setCurrent(origSlide); }
+    setExporting(false);
+  };
 
   const selectedShapeData = doc?.slides[current]?.shapes.find(s => s.id === selectedShape) ?? null;
 
@@ -365,10 +417,19 @@ export default function ContentEditor() {
           </button>
           <input ref={imgInputRef} type="file" accept="image/png,image/jpeg,image/jpg" style={{ display:'none' }} onChange={handleImgFile} />
         </div>
-        {/* Export PDF */}
-        <button onClick={exportPDF} title="Exportar PDF" style={{ display:'flex', alignItems:'center', gap:6, padding:'7px 12px', borderRadius:8, border:'1px solid #e0e0e0', background:'#f8f8f8', color:'#555', fontSize:12, fontWeight:600, cursor:'pointer' }}>
-          <FileDown size={14} /> PDF
-        </button>
+        {/* Export */}
+        <div style={{ display:'flex', alignItems:'center', gap:3, padding:'4px 8px', background:'#f8f8f8', borderRadius:8, border:'1px solid #eee' }}>
+          <span style={{ fontSize:10, fontWeight:700, color:'#aaa', marginRight:3, letterSpacing:1 }}>EXPORT</span>
+          <button onClick={() => exportSlide('png')} disabled={exporting} title="Exportar slide atual como PNG" style={{ display:'flex', alignItems:'center', gap:4, padding:'5px 8px', borderRadius:6, border:'none', background:'transparent', color:'#555', fontSize:11, fontWeight:600, cursor:'pointer' }}>
+            <FileDown size={13} /> PNG
+          </button>
+          <button onClick={() => exportSlide('pdf')} disabled={exporting} title="Exportar slide atual como PDF" style={{ display:'flex', alignItems:'center', gap:4, padding:'5px 8px', borderRadius:6, border:'none', background:'transparent', color:'#555', fontSize:11, fontWeight:600, cursor:'pointer' }}>
+            <FileDown size={13} /> PDF
+          </button>
+          <button onClick={exportAllPDF} disabled={exporting} title="Exportar todos os slides como PDF" style={{ display:'flex', alignItems:'center', gap:4, padding:'5px 8px', borderRadius:6, border:'none', background: exporting ? '#e0e0e0' : '#2563eb', color: exporting ? '#999' : '#fff', fontSize:11, fontWeight:600, cursor:'pointer' }}>
+            {exporting ? 'Exportando...' : 'PDF Completo'}
+          </button>
+        </div>
 
         {/* Palette switcher */}
         <div style={{ display:'flex', alignItems:'center', gap:4, padding:'4px 8px', background:'#f8f8f8', borderRadius:8, border:'1px solid #eee' }}>

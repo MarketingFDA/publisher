@@ -20,4 +20,4 @@ RUN PRISMA_CLI_BINARY_TARGETS=debian-openssl-3.0.x npx prisma generate
 
 EXPOSE 3001
 
-CMD ["sh", "-c", "npx prisma db push --skip-generate && node dist/main"]
+CMD ["sh", "-c", "npx prisma db push --skip-generate && node prisma/seed.cjs && node dist/main"]

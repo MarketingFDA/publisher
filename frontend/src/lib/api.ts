@@ -1,4 +1,5 @@
-const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+const _apiRoot = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/+$/, '');
+const BASE = _apiRoot.endsWith('/api/v1') ? _apiRoot : `${_apiRoot}/api/v1`;
 
 export async function getPersonas() {
   const res = await fetch(`${BASE}/personas`);
@@ -35,5 +36,15 @@ export async function updateContent(id: string, data: { title?: string; slides?:
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
+  return res.json();
+}
+
+export async function createTextContent(personaId: string, title: string, body: string) {
+  const res = await fetch(`${BASE}/content`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ personaId, title, body }),
+  });
+  if (!res.ok) throw new Error('Erro ao salvar conteúdo');
   return res.json();
 }
