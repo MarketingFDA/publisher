@@ -2,8 +2,8 @@ FROM node:20-slim
 
 WORKDIR /app
 
-# OpenSSL necessário para o Prisma query engine
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+# OpenSSL 3.x e libssl3 para o Prisma query/schema engine
+RUN apt-get update && apt-get install -y openssl libssl3 && rm -rf /var/lib/apt/lists/*
 
 # Install deps (NODE_ENV=development garante que devDeps são instaladas para o build)
 COPY backend/package*.json ./
@@ -15,8 +15,8 @@ COPY backend/ ./
 # Compila o NestJS (output em /app/dist/)
 RUN npm run build
 
-# Gera o Prisma client
-RUN npx prisma generate
+# Gera o Prisma client com target explícito para Debian OpenSSL 3.x
+RUN PRISMA_CLI_BINARY_TARGETS=debian-openssl-3.0.x npx prisma generate
 
 EXPOSE 3001
 
