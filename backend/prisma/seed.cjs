@@ -143,4 +143,4 @@ async function main() {
   console.log('Seed concluido com sucesso.');
 }
 
-main().catch(err => { console.error('Seed falhou:', err); process.exit(1); }).finally(() => prisma.$disconnect());
+main().catch(err => { console.error('Seed falhou (nao critico):', err.message || err); }).finally(() => prisma.$disconnect());
