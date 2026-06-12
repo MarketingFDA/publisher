@@ -1,11 +1,11 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "builder": "NIXPACKS",
-    "buildCommand": "cd backend && npm install && npm run build && npx prisma generate && cp -r /app/backend/dist /app/dist && cp -r /app/backend/node_modules /app/node_modules"
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "Dockerfile.backend"
   },
   "deploy": {
-    "startCommand": "cd backend && npx prisma db push --skip-generate && node /app/dist/main",
+    "startCommand": "npx prisma db push --skip-generate && node dist/main",
     "restartPolicyType": "ON_FAILURE"
   }
 }

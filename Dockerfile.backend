@@ -1,0 +1,20 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install deps (NODE_ENV=development garante que devDeps são instaladas para o build)
+COPY backend/package*.json ./
+RUN NODE_ENV=development npm install
+
+# Copia todo o código do backend
+COPY backend/ ./
+
+# Compila o NestJS (output em /app/dist/)
+RUN npm run build
+
+# Gera o Prisma client
+RUN npx prisma generate
+
+EXPOSE 3001
+
+CMD ["sh", "-c", "npx prisma db push --skip-generate && node dist/main"]
