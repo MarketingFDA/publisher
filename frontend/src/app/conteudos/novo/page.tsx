@@ -34,11 +34,14 @@ export default function NovoConteudo() {
     setLoadingPersonas(true);
     setPersonasError('');
     Promise.all([
-      getPersonas().catch(() => null),
+      getPersonas().catch((e: any) => ({ _error: e.message })),
       getPadroes().catch(() => null),
     ]).then(([p, pad]) => {
-      if (!p || !Array.isArray(p) || p.length === 0) {
-        setPersonasError('Não foi possível carregar as personas. Verifique se o backend está online.');
+      if (!p || !Array.isArray(p)) {
+        const err = (p as any)?._error ?? 'falha na requisição';
+        setPersonasError(`Não foi possível conectar ao backend (${err}). Acesse /api/status para diagnóstico.`);
+      } else if (p.length === 0) {
+        setPersonasError('Backend conectado, mas nenhuma persona cadastrada.');
       } else {
         setPersonas(p);
       }
