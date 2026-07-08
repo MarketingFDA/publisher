@@ -12,6 +12,10 @@ const BASE = BACKEND
   ? `${BACKEND.replace(/\/+$/, '')}/api/v1`
   : '/api/v1';
 
+// Base publica reutilizavel por componentes client — evita depender do rewrite
+// server-side do Next (que quebra se BACKEND_URL estiver mal configurada).
+export const API_BASE = BASE;
+
 export async function getPersonas() {
   const res = await fetch(`${BASE}/personas`);
   if (!res.ok) throw new Error(`personas: ${res.status}`);

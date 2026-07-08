@@ -5,7 +5,7 @@
     "dockerfilePath": "backend/Dockerfile"
   },
   "deploy": {
-    "startCommand": "node dist/src/main",
+    "startCommand": "sh -c \"npx prisma db push --skip-generate --accept-data-loss && node prisma/seed.cjs && node dist/src/main\"",
     "restartPolicyType": "ON_FAILURE"
   }
 }

@@ -5,8 +5,9 @@ import {
   ArrowLeft, Save, Check, Loader2, ChevronLeft, ChevronRight,
   Plus, Trash2, Square, Circle, Minus, Copy, Image, FileDown,
 } from 'lucide-react';
+import { API_BASE } from '@/lib/api';
 
-const BASE = '/api/v1';
+const BASE = API_BASE;
 
 interface Shape {
   id: string;
