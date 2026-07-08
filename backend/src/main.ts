@@ -8,4 +8,7 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3001);
   console.log(`Backend rodando em http://localhost:${process.env.PORT ?? 3001}/api/v1`);
 }
-bootstrap();
+bootstrap().catch((err) => {
+  console.error('Falha no bootstrap do backend:', err);
+  process.exit(1);
+});
