@@ -5,7 +5,7 @@
     "dockerfilePath": "backend/Dockerfile"
   },
   "deploy": {
-    "startCommand": "npx prisma db push --skip-generate --accept-data-loss ; echo DIAG_PRISMA_EXIT=$? ; node dist/src/main ; echo DIAG_NODE_EXIT=$?",
+    "startCommand": "node dist/src/main",
     "restartPolicyType": "ON_FAILURE"
   }
 }

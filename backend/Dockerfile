@@ -7,5 +7,8 @@ RUN npm install
 RUN npx prisma generate
 COPY backend/ .
 RUN npm run build
+# Cria o SQLite com schema + dados demo embutidos na imagem (DB efemero no Railway)
+ENV DATABASE_URL="file:./dev.db"
+RUN npx prisma db push --skip-generate --accept-data-loss && (node prisma/seed.cjs || true)
 EXPOSE 3001
 CMD ["node", "dist/src/main"]
